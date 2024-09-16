@@ -1,0 +1,19 @@
+#BlueJ class context
+comment0.target=Paddle
+comment0.text=\r\n\ A\ paddle\ is\ an\ object\ that\ goes\ back\ and\ forth.\ Though\ it\ would\ be\ nice\ if\ balls\ would\ bounce\ of\ it.\r\n\ \r\n\ @author\ The\ teachers\ \r\n\ @version\ 1\r\n
+comment1.params=width\ height\ isPlayer
+comment1.target=Paddle(int,\ int,\ boolean)
+comment1.text=\r\n\ Constructs\ a\ new\ paddle\ with\ the\ given\ dimensions.\r\n
+comment2.params=
+comment2.target=void\ act()
+comment2.text=\r\n\ Act\ -\ do\ whatever\ the\ Paddle\ wants\ to\ do.\ This\ method\ is\ called\ whenever\r\n\ the\ 'Act'\ or\ 'Run'\ button\ gets\ pressed\ in\ the\ environment.\r\n
+comment3.params=
+comment3.target=void\ createImage()
+comment3.text=\r\n\ Creates\ and\ sets\ an\ image\ for\ the\ paddle,\ the\ image\ will\ have\ the\ same\ dimensions\ as\ the\ paddles\ width\ and\ height.\r\n
+comment4.params=
+comment4.target=float\ getDx()
+comment5.params=
+comment5.target=int[]\ getWidthHeight()
+comment6.params=
+comment6.target=int[]\ getDir()
+numComments=7
