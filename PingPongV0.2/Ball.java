@@ -20,12 +20,8 @@ public class Ball extends Actor
     private boolean hasBouncedVertically;
     private int delay;
     private boolean hasBouncedPaddle;
-    private int tempCounter = 0;
     
     private float[] dir; // enhedsvektor
-    
-    float lookX;
-    float lookY;
 
     /**
      * Contructs the ball and sets it in motion!
@@ -66,8 +62,6 @@ public class Ball extends Actor
             checkPaddles();
             checkRestart();
         }
-        lookX = dir[0];
-        lookY = dir[1];
     }
     
     private float[] crossvector(float[] input, Object pad, boolean isPlayer){
@@ -92,8 +86,8 @@ public class Ball extends Actor
        //boolean erBeggePos = (input[0] > 0 && input[1] > 0);
        if (pad == null){
            if (!isTouchingCeiling()){
-               y *= (sammeFortegn) ?  -1 : 1;
-               x *= (sammeFortegn) ?  1 : -1;
+                y *= (sammeFortegn) ?  -1 : 1;
+                x *= (sammeFortegn) ?  1 : -1;
            }
            else{
                // hvis x og y har samme fortegn så skal x skifte eller skal y skifte
@@ -102,12 +96,12 @@ public class Ball extends Actor
            }
        }
        else if (player != null){
-           x *= (sammeFortegn) ? -1 : 1;
-           y *= (sammeFortegn) ? 1 : -1;
-           
-           // omvendt fordi den netop vendes om, fordi sumvektoren skal lægges til den anden vektor
-           y += player.getDir()[0];
-           x += player.getDir()[1];
+            x *= (sammeFortegn) ? -1 : 1;
+            y *= (sammeFortegn) ? 1 : -1;
+            
+            // omvendt fordi den netop vendes om, fordi sumvektoren skal lægges til den anden vektor
+            y += player.getDir()[0];
+            x += player.getDir()[1];
        }
        else if (ai != null){
            // hvis den kommer oppefra lad bolden komme igennem (hvis y er pos ig)
@@ -186,7 +180,6 @@ public class Ball extends Actor
                     dir = crossvector(dir, player, true);
                 }
                 hasBouncedPaddle = true;
-                tempCounter++;
             }
         }
         else{

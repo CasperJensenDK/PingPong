@@ -9,6 +9,7 @@ import greenfoot.*;
  */
 public class PingWorld extends World
 {
+    private GreenfootSound backgroundMusic;
     private static final int WORLD_WIDTH = 500;
     private static final int WORLD_HEIGHT = 700;
 
@@ -18,6 +19,10 @@ public class PingWorld extends World
     public PingWorld(boolean gameStarted)
     {
         super(WORLD_WIDTH, WORLD_HEIGHT, 1); 
+        
+        backgroundMusic = new GreenfootSound("pingworldmusic.mp3");
+        backgroundMusic.playLoop();
+        
         if (gameStarted)
         {
             GreenfootImage background = getBackground();
@@ -33,7 +38,6 @@ public class PingWorld extends World
         
         spawnPaddle();
     }
-    
     // spawner en paddle et sted inden for skærmen
     private void spawnPaddle(){
         // kan randomize længeden
@@ -48,4 +52,12 @@ public class PingWorld extends World
         spawnPaddle();
     }
 
+    @Override
+    public void stopped() {
+        backgroundMusic.pause();
+    }
+    @Override
+    public void started() {
+        backgroundMusic.playLoop();
+    }
 }
