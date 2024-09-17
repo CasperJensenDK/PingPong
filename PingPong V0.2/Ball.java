@@ -20,8 +20,12 @@ public class Ball extends Actor
     private boolean hasBouncedVertically;
     private int delay;
     private boolean hasBouncedPaddle;
+    private int tempCounter = 0;
     
     private float[] dir; // enhedsvektor
+    
+    float lookX;
+    float lookY;
 
     /**
      * Contructs the ball and sets it in motion!
@@ -62,6 +66,8 @@ public class Ball extends Actor
             checkPaddles();
             checkRestart();
         }
+        lookX = dir[0];
+        lookY = dir[1];
     }
     
     private float[] crossvector(float[] input, Object pad, boolean isPlayer){
@@ -98,18 +104,22 @@ public class Ball extends Actor
        else if (player != null){
            x *= (sammeFortegn) ? -1 : 1;
            y *= (sammeFortegn) ? 1 : -1;
-           x += player.getDir()[0];
-           y += player.getDir()[1];
+           
+           // omvendt fordi den netop vendes om, fordi sumvektoren skal lægges til den anden vektor
+           y += player.getDir()[0];
+           x += player.getDir()[1];
        }
        else if (ai != null){
+           // hvis den kommer oppefra lad bolden komme igennem (hvis y er pos ig)
            x *= (sammeFortegn) ? -1 : 1;
            y *= (sammeFortegn) ? 1 : -1;
-           x += ai.getDir()[0];
-           y += ai.getDir()[1];
+           
+           // omvendt fordi den netop vendes om
+           y += ai.getDir()[0];
+           x += ai.getDir()[1];
        }
        float length = (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-       float[] hermannBang = new float[]{y / length, x/ length};
-       return hermannBang;
+       return new float[]{y / length, x/ length};
     }
     private void moveBall(){
         int x = Math.round(dir[0] * speed);
@@ -161,16 +171,22 @@ public class Ball extends Actor
     private void checkPaddles(){
         Actor pad = getOneIntersectingObject(Paddle.class);
         
-        if (pad != null && !hasBouncedPaddle){
-            // dette gøres for at være sikker, jeg ved ikke om man kunne gøre det omvendte, men og lave PaddleCPU til Paddle og stadig gøre det vi vil gøre
-            try {
-                PaddleCPU ai = (PaddleCPU) pad;
-                dir = crossvector(dir, ai, false);
-            }
-            catch (java.lang.ClassCastException e)
-            {
-                Paddle player = (Paddle) pad;
-                dir = crossvector(dir, player, true);
+        if (pad != null){
+            if (!hasBouncedPaddle){
+                // dette gøres for at være sikker, jeg ved ikke om man kunne gøre det omvendte, men og lave PaddleCPU til Paddle og stadig gøre det vi vil gøre
+                try {
+                    PaddleCPU ai = (PaddleCPU) pad;
+                    if (dir[1] < 0){
+                        dir = crossvector(dir, ai, false);
+                    }
+                }
+                catch (java.lang.ClassCastException e)
+                {
+                    Paddle player = (Paddle) pad;
+                    dir = crossvector(dir, player, true);
+                }
+                hasBouncedPaddle = true;
+                tempCounter++;
             }
         }
         else{
@@ -261,6 +277,7 @@ public class Ball extends Actor
         delay = DELAY_TIME;
         hasBouncedHorizontally = false;
         hasBouncedVertically = false;
+        hasBouncedPaddle = false;
         int num = 1;
         
         // måske gør sådan at den kan falde lige ned
