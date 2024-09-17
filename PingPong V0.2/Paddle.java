@@ -46,8 +46,8 @@ public class Paddle extends Actor
                 dir = new int[]{0, 0};
             }
         }
-        
-        setLocation(getX() + dir[0], getY() + dir[1]); 
+        //getX() + dir[0]
+        setLocation(472, getY() + dir[1]); 
         if (getX() + width/2 > getWorld().getWidth()){
             setLocation(getWorld().getWidth() - width/2, getY());
         }

@@ -19,6 +19,7 @@ public class Ball extends Actor
     private boolean hasBouncedHorizontally;
     private boolean hasBouncedVertically;
     private int delay;
+    private boolean hasBouncedPaddle;
     
     private float[] dir; // enhedsvektor
 
@@ -85,8 +86,8 @@ public class Ball extends Actor
        //boolean erBeggePos = (input[0] > 0 && input[1] > 0);
        if (pad == null){
            if (!isTouchingCeiling()){
-               y *= (input[0] > 0 && input[1] > 0) ?  -1 : 1;
-               x *= (input[0] > 0 && input[1] > 0) ?  1 : -1;
+               y *= (sammeFortegn) ?  -1 : 1;
+               x *= (sammeFortegn) ?  1 : -1;
            }
            else{
                // hvis x og y har samme fortegn så skal x skifte eller skal y skifte
@@ -107,7 +108,8 @@ public class Ball extends Actor
            y += ai.getDir()[1];
        }
        float length = (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-       return new float[]{y / length, x/ length};
+       float[] hermannBang = new float[]{y / length, x/ length};
+       return hermannBang;
     }
     private void moveBall(){
         int x = Math.round(dir[0] * speed);
@@ -159,7 +161,7 @@ public class Ball extends Actor
     private void checkPaddles(){
         Actor pad = getOneIntersectingObject(Paddle.class);
         
-        if (pad != null){
+        if (pad != null && !hasBouncedPaddle){
             // dette gøres for at være sikker, jeg ved ikke om man kunne gøre det omvendte, men og lave PaddleCPU til Paddle og stadig gøre det vi vil gøre
             try {
                 PaddleCPU ai = (PaddleCPU) pad;
@@ -170,6 +172,9 @@ public class Ball extends Actor
                 Paddle player = (Paddle) pad;
                 dir = crossvector(dir, player, true);
             }
+        }
+        else{
+            hasBouncedPaddle = false;
         }
     }
 
