@@ -1,0 +1,12 @@
+#BlueJ class context
+comment0.target=PaddleCPU
+comment0.text=\r\n\ Write\ a\ description\ of\ class\ PaddleCPU\ here.\r\n\ \r\n\ @author\ (your\ name)\ \r\n\ @version\ (a\ version\ number\ or\ a\ date)\r\n
+comment1.params=width\ height\ isPlayer
+comment1.target=PaddleCPU(int,\ int,\ boolean)
+comment2.params=
+comment2.target=void\ act()
+comment2.text=\r\n\ Act\ -\ do\ whatever\ the\ PaddleCPU\ wants\ to\ do.\ This\ method\ is\ called\ whenever\r\n\ the\ 'Act'\ or\ 'Run'\ button\ gets\ pressed\ in\ the\ environment.\r\n
+comment3.params=
+comment3.target=void\ tryChangeDirection()
+comment3.text=\r\n\ Will\ rotate\ the\ paddle\ 180\ degrees\ if\ the\ paddle\ is\ at\ worlds\ edge.\r\n
+numComments=4
