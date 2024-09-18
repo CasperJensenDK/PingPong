@@ -22,9 +22,6 @@ public class Ball extends Actor
     private boolean hasBouncedPaddle;
     
     private float[] dir; // enhedsvektor
-    
-    private float lookX;
-    private float lookY;
 
     /**
      * Contructs the ball and sets it in motion!
@@ -59,13 +56,10 @@ public class Ball extends Actor
         else
         {
             move(speed);
-            //moveBall();
             checkBounceOffWalls();
             checkBounceOffCeiling();
             checkPaddles();
             checkRestart();
-            lookX = dir[0];
-            lookY = dir[1];
         }
     }
     
@@ -152,29 +146,6 @@ public class Ball extends Actor
         // enhedsvektor
         return new float[]{x / length, y / length}; // måske tjek at y ikke bliver 0 så den kører sidelænds
     }
-    private void moveBall(){
-        int x = Math.round(dir[0] * speed);
-        int y = Math.round(dir[1] * speed);
-        if (x == 0){
-            if (dir[0] < 0){
-                x = -1;
-            }
-            else{
-                x = 1;
-            }
-        }
-        
-        if (y == 0){
-            if (dir[1] < 0){
-                y = -1;
-            }
-            else{
-                y = 1;
-            }
-        }
-        setLocation(getX() + x, getY() + y);
-    }
-
     /**
      * Returns true if the ball is touching one of the side walls.
      */
