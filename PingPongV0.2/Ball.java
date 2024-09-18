@@ -22,6 +22,9 @@ public class Ball extends Actor
     private boolean hasBouncedPaddle;
     
     private float[] dir; // enhedsvektor
+    
+    private float lookX;
+    private float lookY;
 
     /**
      * Contructs the ball and sets it in motion!
@@ -61,23 +64,22 @@ public class Ball extends Actor
             checkBounceOffCeiling();
             checkPaddles();
             checkRestart();
+            lookX = dir[0];
+            lookY = dir[1];
         }
     }
     
     private float[] crossvector(float[] input, Object pad, boolean isPlayer){
-        float[] a = {input[0],0};
-        double v1 = Math.acos((input[0] * a[0] + input[1] * a[1])/(Math.sqrt(Math.pow(input[0], 2) + Math.pow(input[1], 2)) * Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2))));
-        double v2 = Math.PI - (v1 + Math.PI/2);
-        double tanInputAngle = Math.atan2(input[1], input[0]); // tan^-1(y/x) - to degrees
-        double tanB = 0;
+        final float minY = 0.5f;
+        float x = input[0];
+        float y = (input[1] < minY && input[1] > -minY) ? (input[1] >= 0) ? minY : -minY: input[1];
         
-        double kiggerdu = Math.atan2(-1, -1);
+        double tanInputAngle = Math.atan2(y, x); // tan^-1(y/x) - to degrees
+        double tanB = 0;
         
         Paddle player = null;
         PaddleCPU ai = null;
         //koordinater, samt længde
-        float x = input[0];
-        float y = input[1];
         float length = (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
         
         if (isPlayer && pad != null){
@@ -91,21 +93,13 @@ public class Ball extends Actor
         if (pad == null){
            if (!isTouchingCeiling()){
                 tanB = (posY) ? Math.PI - tanInputAngle : -Math.PI - tanInputAngle;
-                
                 x = length * (float) Math.cos(tanB);
                 y = length * (float) Math.sin(tanB);
-                
-                // omregn til normale grader ift greenfoot
-                //tanB = (tanB > 0) ? (0.5f * Math.PI) - tanB : tanB + (0.5f * Math.PI);
            }
            else{
                 tanB = (posY) ? -Math.abs(tanInputAngle) : Math.abs(tanInputAngle);
-               
                 x = length * (float) Math.cos(tanB);
                 y = length * (float) Math.sin(tanB);
-                
-                // omregn til normale grader ift greenfoot
-                //tanB = (tanB > 0) ? (0.5f * Math.PI) - tanB : tanB + (0.5f * Math.PI);
            }
         }
         // mangler opdatering fra player - burde være samme som ceiling
@@ -113,11 +107,19 @@ public class Ball extends Actor
             // hvis spiller
             // betingelse
             tanB = (posY) ? -Math.abs(tanInputAngle) : Math.abs(tanInputAngle);;
-            
             // nye koordinater sumvektor
-            x = length * (float) Math.cos(tanB) + player.getDir()[0];
+            Random jesus = new Random();
+            x = length * (float) Math.cos(tanB) + ((player.getDir()[0]/2) + jesus.nextFloat());
             y = length * (float) Math.sin(tanB) + player.getDir()[1];
             
+            if (y < minY && y > -minY ){
+                if ((y >= 0)){
+                    y = minY;
+                }
+                else{
+                    y = -minY;
+                }
+            }
             // new angle
             tanB = Math.atan2(y, x);
             // ny længde siden koordinaterne bliver ændret
@@ -127,19 +129,25 @@ public class Ball extends Actor
             // hvis ai
             // betingelse
             tanB = (posY) ? -Math.abs(tanInputAngle) : Math.abs(tanInputAngle);;
-            
             // nye koordinater sumvektor
-            x = length * (float) Math.cos(tanB) + ai.getDir()[0];
+            Random jesus = new Random();
+            x = length * (float) Math.cos(tanB) + (ai.getDir()[0] + jesus.nextFloat());
             y = length * (float) Math.sin(tanB) + ai.getDir()[1];
             
+            if (y < minY && y > -minY){
+                if ((y >= 0)){
+                    y = minY;
+                }
+                else{
+                    y = -minY;
+                }
+            }
             // new angle
             tanB = Math.atan2(y, x);
             // ny længde siden koordinaterne bliver ændret
             length = (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
         }
-        // drejer bolden
         //do the dreging
-        double kigPåmig = Math.round(Math.toDegrees(tanB));
         setRotation((int) Math.round(Math.toDegrees(tanB)));
         // enhedsvektor
         return new float[]{x / length, y / length}; // måske tjek at y ikke bliver 0 så den kører sidelænds
