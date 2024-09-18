@@ -40,24 +40,25 @@ public class PingWorld extends World
             Greenfoot.setWorld(new IntroWorld());
         }
         
-        spawnPaddle();
+        spawnPaddle((Greenfoot.getRandomNumber(2) == 0) ? -1 : 1);
         
         playerScore = 0;
         //ballScore = 0;
         updateScoreboard();
     }
     // spawner en paddle et sted inden for skærmen
-    private void spawnPaddle(){
+    private void spawnPaddle(int direction){
         // kan randomize længeden
         // randomize dir
         int paddleAfstandFraTop = 20;
-        //                                                                               der hvor spiller spawner, buffer + højden fra centrum, tilføjer et minimum
-        addObject(new PaddleCPU(100, 20, false), WORLD_WIDTH - 100/2, Greenfoot.getRandomNumber(((WORLD_HEIGHT - 50) - 50 + 20/2) - paddleAfstandFraTop) + paddleAfstandFraTop);
+        int x = (direction > 0) ? 1 : 499 - 5;
+        //                                                                          der hvor spiller spawner, buffer + højden fra centrum, tilføjer et minimum
+        addObject(new PaddleCPU(100, 20, false, direction), x, Greenfoot.getRandomNumber(((WORLD_HEIGHT - 50) - 50 + 20/2) - paddleAfstandFraTop) + paddleAfstandFraTop);
     }
     
-    public void terminatePaddle(PaddleCPU kurt) {
+    public void terminatePaddle(PaddleCPU kurt, int direction) {
         removeObject(kurt);
-        spawnPaddle();
+        spawnPaddle(direction);
     }
 
     //Scoreboard stuff

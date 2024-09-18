@@ -8,10 +8,10 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
  */
 public class PaddleCPU extends Paddle
 {
-    private int dx; // speed
-    public PaddleCPU(int width, int height, boolean isPlayer){
+    private int dx; // retning
+    public PaddleCPU(int width, int height, boolean isPlayer, int direction){
         super(width, height, isPlayer);
-        dx = 1;
+        dx = direction;
         createImage();
     }
     /**
@@ -23,7 +23,6 @@ public class PaddleCPU extends Paddle
         tryChangeDirection();
         if (getWorld() != null){
             setLocation(getX() + dx, getY());
-
         }
     }
     
@@ -34,14 +33,19 @@ public class PaddleCPU extends Paddle
     {
         //Check to see if we are touching the outer boundaries of the world:
         // IF we are touching the right boundary OR we are touching the left boundary:
-        if(getX() + getWidthHeight()[0]/2 >= getWorld().getWidth() || getX() - getWidthHeight()[0]/2 <= 0)
+        //getWidthHeight()[0]/2, - getWidthHeight()[0]/2
+        if(getX() >= getWorld().getWidth() - 5 || getX() <= 0)
         {
             //Change our 'x' direction to the inverted direction:
-            dx = dx * -1;
+            int newX = (dx > 0) ? 1 : 499 - 5;
+            setLocation(newX, getY());
+            
+            
             
             if (Greenfoot.getRandomNumber(4) == 2){
+                dx = dx * -1;
                 PingWorld kurtJensen = (PingWorld) getWorld();
-                kurtJensen.terminatePaddle(this);
+                kurtJensen.terminatePaddle(this, dx);
             }
         }
     }
