@@ -55,8 +55,8 @@ public class Ball extends Actor
         }
         else
         {
-            ///move(speed);
-            moveBall();
+            move(speed);
+            //moveBall();
             checkBounceOffWalls();
             checkBounceOffCeiling();
             checkPaddles();
@@ -65,55 +65,85 @@ public class Ball extends Actor
     }
     
     private float[] crossvector(float[] input, Object pad, boolean isPlayer){
-        /*
-        float[] vandret = {1,0};
-        double vinkelMVandret = Math.acos((input[0] * vandret[0] + input[1] * vandret[1])/(Math.sqrt(Math.pow(input[0], 2) + Math.pow(input[1], 2)) * Math.sqrt(Math.pow(vandret[0], 2) + Math.pow(vandret[1], 2))));
-        double andenvektorVinkel = (180 - (vinkelMVandret + 90)) + 90;
-        */
-       Paddle player = null;
-       PaddleCPU ai = null;
-       float x = input[0];
-       float y = input[1];
-    
-       if (isPlayer && pad != null){
+        float[] a = {input[0],0};
+        double v1 = Math.acos((input[0] * a[0] + input[1] * a[1])/(Math.sqrt(Math.pow(input[0], 2) + Math.pow(input[1], 2)) * Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2))));
+        double v2 = Math.PI - (v1 + Math.PI/2);
+        double tanInput = Math.atan(input[1]/input[0]); // tan^-1(y/x) - to degrees
+        double tanB = 0;
+        
+        Paddle player = null;
+        PaddleCPU ai = null;
+        //koordinater, samt længde
+        float x = input[0];
+        float y = input[1];
+        float length = (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        
+        // juster til greenfoot koordinatsystem
+        tanInput -= (input[0] < 0 && input[1] < 0) ? -(tanInput*2) : 0.5f * Math.PI;
+        
+        // positiv omløbsretning
+        tanInput += (tanInput < 0)? Math.PI * 2 : 0;
+        
+        if (isPlayer && pad != null){
            player = (Paddle) pad;
-       }
-       else if (!isPlayer && pad != null){
+        }
+        else if (!isPlayer && pad != null){
            ai = (PaddleCPU) pad;
-       }
-       
-       boolean sammeFortegn = (x > 0 && y > 0) || (x < 0 && y < 0);
-       //boolean erBeggePos = (input[0] > 0 && input[1] > 0);
-       if (pad == null){
+        }
+        
+        boolean sammeFortegn = (x > 0 && y > 0) || (x < 0 && y < 0);
+        if (pad == null){
            if (!isTouchingCeiling()){
-                y *= (sammeFortegn) ?  -1 : 1;
-                x *= (sammeFortegn) ?  1 : -1;
+                tanB = sammeFortegn ? tanInput + (2 * v2) : tanInput - (2 * v2);
+                
+                x = length * (float) Math.cos(tanB);
+                y = length * (float) Math.sin(tanB);
+                // beregn enhedsvektor
            }
            else{
-               // hvis x og y har samme fortegn så skal x skifte eller skal y skifte
-               x *= (sammeFortegn) ? -1 : 1;
-               y *= (sammeFortegn) ? 1 : -1;
+                tanB = tanInput;
+                tanB += (x > 0) ? ((y > 0) ? (2 * v2 + Math.PI) : -(2 * v2 + Math.PI)) : ((y > 0) ? (2 * v1) : -(2 * v1));
+               
+                x = length * (float) Math.cos(tanB);
+                y = length * (float) Math.sin(tanB);
            }
-       }
-       else if (player != null){
-            x *= (sammeFortegn) ? -1 : 1;
-            y *= (sammeFortegn) ? 1 : -1;
+        }
+        else if (player != null){
+            // hvis spiller
+            // betingelse
+            tanB = tanInput;
+            tanB += (x > 0) ? ((y > 0) ? (2 * v2 + Math.PI) : -(2 * v2 + Math.PI)) : ((y > 0) ? (2 * v1) : -(2 * v1));
+            // nye koordinater
+            x = length * (float) Math.cos(tanB);
+            y = length * (float) Math.sin(tanB);
             
-            // omvendt fordi den netop vendes om, fordi sumvektoren skal lægges til den anden vektor
-            y += player.getDir()[0];
-            x += player.getDir()[1];
-       }
-       else if (ai != null){
-           // hvis den kommer oppefra lad bolden komme igennem (hvis y er pos ig)
-           x *= (sammeFortegn) ? -1 : 1;
-           y *= (sammeFortegn) ? 1 : -1;
-           
-           // omvendt fordi den netop vendes om
-           y += ai.getDir()[0];
-           x += ai.getDir()[1];
-       }
-       float length = (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-       return new float[]{y / length, x/ length};
+            x += player.getDir()[0];
+            y += player.getDir()[1];
+            
+            // ny længde siden koordinaterne bliver ændret
+            length = (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        }
+        else if (ai != null){
+            // hvis ai
+            // betingeæse
+            tanB = tanInput;
+            tanB += (x > 0) ? ((y > 0) ? (2 * v2 + Math.PI) : -(2 * v2 + Math.PI)) : ((y > 0) ? (2 * v1) : -(2 * v1));
+            // nye koordinator
+            x = length * (float) Math.cos(tanB);
+            y = length * (float) Math.sin(tanB);
+            
+            x += ai.getDir()[0];
+            y += ai.getDir()[1];
+            
+            // ny længde siden koordinaterne bliver ændret
+            length = (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        }
+        // drejer bolden
+        //do the dreging
+        double kigPåmig = Math.round(Math.toDegrees(tanB));
+        setRotation((int) Math.round(Math.toDegrees(tanB)));
+        // enhedsvektor
+        return new float[]{x / length, y / length}; // måske tjek at y ikke bliver 0 så den kører sidelænds
     }
     private void moveBall(){
         int x = Math.round(dir[0] * speed);
@@ -272,14 +302,16 @@ public class Ball extends Actor
         hasBouncedVertically = false;
         hasBouncedPaddle = false;
         int num = 1;
+        int rot = 45;
         
         // måske gør sådan at den kan falde lige ned
         if (Greenfoot.getRandomNumber(2) == 1){
             num = -1;
+            rot += 90;
         }
         
         dir = new float[]{num, 1};
-        //setRotation(Greenfoot.getRandomNumber(STARTING_ANGLE_WIDTH)+STARTING_ANGLE_WIDTH/2);
+        setRotation(rot);
     }
 
 }
