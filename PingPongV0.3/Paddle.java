@@ -14,6 +14,13 @@ public class Paddle extends Actor
     private int speed; // speed
     private boolean isPlayer = false;
     private int[] dir;
+    private int bounceCount;
+    private int gameLevel;
+    private String[] levelList;
+    private String[] ballList;
+    private int delayCounter;
+    private int delayStart;
+    
 
     /**
      * Constructs a new paddle with the given dimensions.
@@ -25,7 +32,11 @@ public class Paddle extends Actor
         this.isPlayer = isPlayer;
         dir = new int[]{0, 0};
         speed = 2;
-        createImage();
+        createImage();    
+        delayCounter = 0;
+        delayStart = 50;
+        levelList = new String[] {"pingbackground1.png", "pingbackground2.png", "pingbackground3.png", "pingbackground4.png", "pingbackground5.png", "pingbackground6.png"};
+        ballList = new String[] {"ball1.png", "ball2.png", "ball3.png", "ball4.png", "ball5.png", "ball6.png"};
     }
 
     /**
@@ -54,6 +65,11 @@ public class Paddle extends Actor
         else if (getX() - width/2 < 0){
             setLocation(0 + width/2, getY());
         }
+        delayCounter++;
+        if (getOneIntersectingObject(Ball.class) != null && delayCounter>= delayStart) {
+            changeLevel();
+            delayCounter = 0;
+        }        
     }
 
     /**
@@ -79,4 +95,17 @@ public class Paddle extends Actor
         return dir;
     }
 
+    public void changeLevel() { //Skifte background
+        if (getOneIntersectingObject(Ball.class) != null) {
+         bounceCount++;
+        }
+        
+        if (bounceCount % 10 == 0 && bounceCount != 0 && delayCounter>= delayStart) {
+            gameLevel++;
+            String levelChanger = levelList[gameLevel % levelList.length];
+            getWorld().setBackground(levelChanger);
+            //Skift bold i "Ball" senere
+        }
+    }
 }
+

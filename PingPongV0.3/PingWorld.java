@@ -1,6 +1,5 @@
 import greenfoot.*;
 
-
 /**
  * The Ping World is where Balls and Paddles meet to play pong.
  * 
@@ -12,7 +11,12 @@ public class PingWorld extends World
     private GreenfootSound backgroundMusic;
     private static final int WORLD_WIDTH = 500;
     private static final int WORLD_HEIGHT = 700;
-
+    
+    private int playerScore;
+    //private int ballScore;
+    private GreenfootImage playerScoreImage;
+    //private GreenfootImage ballScoreImage;
+    
     /**
      * Constructor for objects of class PingWorld.
      */
@@ -37,6 +41,10 @@ public class PingWorld extends World
         }
         
         spawnPaddle();
+        
+        playerScore = 0;
+        //ballScore = 0;
+        updateScoreboard();
     }
     // spawner en paddle et sted inden for skærmen
     private void spawnPaddle(){
@@ -52,6 +60,28 @@ public class PingWorld extends World
         spawnPaddle();
     }
 
+    //Scoreboard stuff
+    public void increasePlayerScore() {
+        playerScore++;
+        updateScoreboard();
+    }
+    
+    /*public void increaseBallScore() {
+        ballScore++;
+        updateScoreboard();
+    }*/
+    
+    private void updateScoreboard() {       
+    GreenfootImage background = getBackground();
+    background.setColor(Color.BLACK);
+    greenfoot.Font fontScore = new greenfoot.Font("OCR A Extended", true, false, 20);
+    background.setFont(fontScore);
+    
+    background.drawString("Player: " + playerScore, 10, 30);
+    //background.drawString("CPU: " + ballScore, 10, 60);
+    }
+    
+    //Making sure music loops and stops when needed
     @Override
     public void stopped() {
         backgroundMusic.pause();

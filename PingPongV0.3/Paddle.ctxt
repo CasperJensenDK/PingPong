@@ -16,4 +16,6 @@ comment5.params=
 comment5.target=int[]\ getWidthHeight()
 comment6.params=
 comment6.target=int[]\ getDir()
-numComments=7
+comment7.params=
+comment7.target=void\ changeLevel()
+numComments=8

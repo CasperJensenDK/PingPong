@@ -18,6 +18,7 @@ public class IntroWorld extends World
     private int colorIndex;
     private int delayCounter;
     private int delayStart;
+    
     private String introMessage;
     private String introMessageTwo;
     private String introMessageThree;
@@ -30,9 +31,15 @@ public class IntroWorld extends World
     {
         super(WORLD_WIDTH, WORLD_HEIGHT, 1); 
         colors = new Color[] {Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.MAGENTA};
+        Color[] darkerColors = new Color[colors.length]; //Make colors darker
+        for (int i = 0; i < colors.length; i++) {
+            darkerColors[i] = colors[i].darker();
+        }
+        colors = darkerColors;
         colorIndex = 0;
         delayCounter = 0;
         delayStart = 240; //Sets the delay between color swaps
+        
         //Messages
         introMessage = "Welcome to Ping!";
         introMessageTwo = "PING!!!";
@@ -40,11 +47,13 @@ public class IntroWorld extends World
         //introMessageFour = "Hit <enter> to start game..."; Redundant
         addIntroMessage();
         addIntroMessages();
+        
         //Clickable figures for multiplayer and singleplayer
         Multiplayer multiplayer = new Multiplayer("multiplayer.png", "multiyellow.png");
         addObject(multiplayer, getWidth() / 2 + 100, getHeight() / 2 - 120);
         Singleplayer singleplayer = new Singleplayer("singleplayer.png", "singleyellow.png");
         addObject(singleplayer, getWidth() / 2 - 120, getHeight() / 2 - 120);
+        
         //Sound
         introMusic = new GreenfootSound("introscreenmusic.mp3");        
     }
@@ -52,7 +61,7 @@ public class IntroWorld extends World
     public void act()
     {
         delayCounter++;
-        if (delayCounter>= delayStart) 
+        if (delayCounter>= delayStart) //Loops the background colors on intro
         {
             delayCounter = 0;
             colorIndex = (colorIndex + 1) % colors.length;
@@ -77,11 +86,14 @@ public class IntroWorld extends World
         setBackground(background);
     }
     
+    
+    
     private void addIntroMessage() { // Bigger intro messages
         GreenfootImage background = getBackground();
         background.setColor(Color.BLACK);
         greenfoot.Font font = new greenfoot.Font("OCR A Extended", true, false, 48);
         background.setFont(font);
+        
         background.drawString(introMessage, getWidth() / 2 - 240, getHeight() / 2);
         background.drawString(introMessageTwo, getWidth() / 2 - 105, getHeight() / 2 - 225);
     }
@@ -91,10 +103,11 @@ public class IntroWorld extends World
     background.setColor(Color.BLACK);
     greenfoot.Font fonttwo = new greenfoot.Font("OCR A Extended", true, false, 22);
     background.setFont(fonttwo);
+    
     background.drawString(introMessageThree, getWidth() / 2 - 245, getHeight() / 2 + 75);
     //background.drawString(introMessageFour, getWidth() / 2 - 165, getHeight() / 2 + 150);
     }
-    
+    // Making sure music loops and stops
     @Override
     public void stopped() {
         introMusic.pause();
