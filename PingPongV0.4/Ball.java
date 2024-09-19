@@ -102,8 +102,8 @@ public class Ball extends Actor
             // betingelse
             tanB = (posY) ? -Math.abs(tanInputAngle) : Math.abs(tanInputAngle);;
             // nye koordinater sumvektor
-            Random jesus = new Random();
-            x = length * (float) Math.cos(tanB) + ((player.getDir()[0]/2) + jesus.nextFloat());
+            Random rnd = new Random();
+            x = length * (float) Math.cos(tanB) + ((player.getDir()[0]/2) + rnd.nextFloat());
             y = length * (float) Math.sin(tanB) + player.getDir()[1];
             
             if (y < minY && y > -minY ){
