@@ -39,8 +39,8 @@ public class Death extends World
     {    
         // Create a new world with 600x400 cells with a cell size of 1x1 pixels.
         super(500, 700, 1); 
-      setBackground("pingbackground0.png");
-      //Messages
+        setBackground("pingbackground0.png");
+        //Messages
         introMessage = "GAME!";
         introMessageTwo = "OVER!!!";
         introMessageThree = theInsult;
@@ -48,13 +48,30 @@ public class Death extends World
         addIntroMessage();
         addIntroMessages();
     }
+    public Death(int playerNumber){
+        // Create a new world with 600x400 cells with a cell size of 1x1 pixels.
+        super(500, 700, 1); 
+        setBackground("pingbackground0.png");
+        //Messages
+        introMessage = "GAME!";
+        introMessageTwo = "OVER!!!";
+        introMessageThree = theInsult;
+        introMessageFour = "Hit <Enter> to restart game...";
+        addMessageForPlayer("A message for Player " + playerNumber + ":");
+        addIntroMessage();
+        addIntroMessages();
+    }
     public void act()
     {
         reset();
-
-        
     }
-    
+    private void addMessageForPlayer(String str){
+        GreenfootImage background = getBackground();
+        background.setColor(Color.BLACK);
+        greenfoot.Font fonttwo = new greenfoot.Font("OCR A Extended", true, false, 12);
+        background.setFont(fonttwo);
+        background.drawString(str, getWidth()/2 - (int) (str.length() * 12 * 0.6f)/2, getHeight() / 2 + 55);
+    }
     
     private void addIntroMessage() { // Bigger intro messages
         GreenfootImage background = getBackground();

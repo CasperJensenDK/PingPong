@@ -24,6 +24,8 @@ public class Ball extends Actor
     private float[] dir; // enhedsvektor
     private int[] dxdy = new int[]{0, 0};
     private int besureSureCounter = 0;
+    
+    private int multiplayerBounce = 0;
 
     /**
      * Contructs the ball and sets it in motion!
@@ -187,7 +189,7 @@ public class Ball extends Actor
     
     private void checkPaddles(){
         Actor pad = getOneIntersectingObject(Paddle.class);
-        
+        PingWorld sovs = (PingWorld) getWorld();
         if (pad != null){
             if (!hasBouncedPaddle){
                 // dette gøres for at være sikker, jeg ved ikke om man kunne gøre det omvendte, men og lave PaddleCPU til Paddle og stadig gøre det vi vil gøre
@@ -203,6 +205,13 @@ public class Ball extends Actor
                     Greenfoot.playSound("hitplayer.wav");
                     Paddle player = (Paddle) pad;
                     dir = crossvector(dir, player, true);
+                    if (sovs.getIsMultiplayer()){
+                       multiplayerBounce++; 
+                    }
+                    if (multiplayerBounce >= 10){
+                        multiplayerBounce = 0;
+                        player.updatedByBall();
+                    }
                 }
                 hasBouncedPaddle = true;
             }
@@ -240,10 +249,16 @@ public class Ball extends Actor
     {
         if (isTouchingCeiling())
         {
-            if (! hasBouncedVertically)
+            PingWorld sovs = (PingWorld) getWorld();
+            if (! hasBouncedVertically && !sovs.getIsMultiplayer())
             {
                 Greenfoot.playSound("getPoint.wav");
                 revertVertically();
+            }
+            else if (sovs.getIsMultiplayer()){
+                Greenfoot.playSound("loselife.mp3");
+                getWorld().getObjects(Paddle.class).get(1).subtractLife();
+                init(speed, ballImage);
             }
         }
         else
@@ -311,7 +326,7 @@ public class Ball extends Actor
         }
         if (getWorld() != null)
         {
-        setLocation(getWorld().getWidth() / 2, getWorld().getHeight() / 2);    
+            setLocation(getWorld().getWidth() / 2, getWorld().getHeight() / 2);    
         }
         
         dir = new float[]{num, 1};

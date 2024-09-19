@@ -18,35 +18,50 @@ public class PingWorld extends World
     private GreenfootImage playerScoreImage;
     //private GreenfootImage ballScoreImage;
     
+    // multiplayer
+    private boolean multiplayer = false;
+    
     /**
      * Constructor for objects of class PingWorld.
      */
-    public PingWorld(boolean gameStarted)
+    public PingWorld(boolean gameStarted, boolean multiP)
     {
         super(WORLD_WIDTH, WORLD_HEIGHT, 1); 
-        
+        multiplayer = multiP;
         backgroundMusic = new GreenfootSound("pingworldmusic.mp3");
         backgroundMusic.playLoop();
-        
-        if (gameStarted)
-        {
-            GreenfootImage background = getBackground();
-            background.setColor(Color.BLACK);
-            // Create a new world with WORLD_WIDTHxWORLD_HEIGHT cells with a cell size of 1x1 pixels.
-            addObject(new Ball(), WORLD_WIDTH/2, WORLD_HEIGHT/2);
-            addObject(new Paddle(100,20, true), 60, WORLD_HEIGHT - 50);
-        }
-        else
-        {
-            Greenfoot.setWorld(new IntroWorld());
-        }
-        
-        spawnPaddle((Greenfoot.getRandomNumber(2) == 0) ? -1 : 1);
-        
-        playerScore = 0;
         level = 1;
-        //ballScore = 0;
-        updateScoreboard(level);
+        if (!multiP){
+            if (gameStarted)
+            {
+                GreenfootImage background = getBackground();
+                background.setColor(Color.BLACK);
+                // Create a new world with WORLD_WIDTHxWORLD_HEIGHT cells with a cell size of 1x1 pixels.
+                addObject(new Paddle(100,20, true), 60, WORLD_HEIGHT - 50);
+            }
+            else
+            {
+                Greenfoot.setWorld(new IntroWorld());
+            }
+            
+            spawnPaddle((Greenfoot.getRandomNumber(2) == 0) ? -1 : 1);
+            
+            playerScore = 0;
+            //ballScore = 0;
+            updateScoreboard(level);
+        }
+        else{
+            // add players
+            Paddle p1 = new Paddle(100,20, true);
+            p1.constructPlayersForMultiplayer(1, true);
+            Paddle p2 = new Paddle(100,20, true);
+            p2.constructPlayersForMultiplayer(2, true);
+            addObject(p1, 60, WORLD_HEIGHT - 50);
+            addObject(p2, 60, 50);
+            updateScoreboard(level);
+        }
+        
+        addObject(new Ball(), WORLD_WIDTH/2, WORLD_HEIGHT/2);
     }
     // spawner en paddle et sted inden for skærmen
     private void spawnPaddle(int direction){
@@ -60,7 +75,9 @@ public class PingWorld extends World
     public int getPlayerScore(){
         return playerScore;
     }
-    
+    public boolean getIsMultiplayer(){
+        return multiplayer;
+    }
     public void terminatePaddle(PaddleCPU kurt, int direction) {
         removeObject(kurt);
         spawnPaddle(direction);
@@ -72,22 +89,24 @@ public class PingWorld extends World
         updateScoreboard(level);
     }
     
-    /*public void increaseBallScore() {
-        ballScore++;
-        updateScoreboard();
-    }*/
-    
     public void updateScoreboard(int gameLevel) {
-    setBackground(Paddle.levelList[(gameLevel - 1) % Paddle.levelList.length]);
-    GreenfootImage background = getBackground();
-    background.setColor(Paddle.colorList[(gameLevel - 1) % Paddle.levelList.length]);
-    greenfoot.Font fontScore = new greenfoot.Font("OCR A Extended", true, false, 20);
-    background.setFont(fontScore);
-    level = gameLevel;
-    background.drawString("Player: " + playerScore, 10, 30);
-    background.drawString("life: " + getObjects(Paddle.class).get(0).getALife(), 10, 50);
-    //background.drawString("CPU: " + ballScore, 10, 60);
-    background.drawString("Level: " + gameLevel,350 ,30);
+        setBackground(Paddle.levelList[(gameLevel - 1) % Paddle.levelList.length]);
+        GreenfootImage background = getBackground();
+        background.setColor(Paddle.colorList[(gameLevel - 1) % Paddle.levelList.length]);
+        greenfoot.Font fontScore = new greenfoot.Font("OCR A Extended", true, false, 20);
+        background.setFont(fontScore);
+        level = gameLevel;
+        if (!multiplayer){
+            background.drawString("Player: " + playerScore, 10, 30);
+            background.drawString("life: " + getObjects(Paddle.class).get(0).getALife(), 10, 50);
+            //background.drawString("CPU: " + ballScore, 10, 60);
+            background.drawString("Level: " + gameLevel,350 ,30);
+        }
+        else{
+            background.drawString("life: " + getObjects(Paddle.class).get(0).getALife(), 10, WORLD_HEIGHT - 15);
+            background.drawString("life: " + getObjects(Paddle.class).get(1).getALife(), 10, 30);
+            background.drawString("Level: " + gameLevel,350 ,30);
+        }
     }
     
     //Making sure music loops and stops when needed

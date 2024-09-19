@@ -15,7 +15,7 @@ public class Paddle extends Actor
     private boolean isPlayer = false;
     private int[] dir;
     private int bounceCount;
-    private int gameLevel = 1;
+    private static int gameLevel = 1;
     static final String[] levelList = new String[] {"pingbackground0.png","pingbackground1.png", "pingbackground2.png", "pingbackground3.png", "pingbackground4.png", "pingbackground5.png", "pingbackground6.png"};
     private String[] ballList;
     private String[] paddleList;
@@ -26,6 +26,10 @@ public class Paddle extends Actor
     private PingWorld sovs;
     private int currentPlayerScore = 0;
     private int life;
+    
+    //multiplayer variabler
+    private boolean multiplayer = false;
+    private int playerNumber = 1;
 
     
 
@@ -48,6 +52,7 @@ public class Paddle extends Actor
         life = 3;
         if (isPlayer){
             imagePaddle = "paddle0.png";
+            gameLevel = 1;
         }
     }
 
@@ -57,7 +62,62 @@ public class Paddle extends Actor
      */
     public void act() 
     {
-        // hvis vi vil kan vil tilføje acceleration
+        if (sovs == null){
+            sovs = (PingWorld) getWorld();
+        }
+        if (!multiplayer){
+            singlePlayer();
+        }
+        else{
+            multiplayer();
+        }
+    }
+    private void multiplayer(){
+        if (playerNumber == 1){
+            if (getWorld() != null && isPlayer){
+                if (Greenfoot.isKeyDown("A")){
+                    dir[0] = -speed;
+                }
+                else if (Greenfoot.isKeyDown("D")){
+                    dir[0] = speed;
+                }
+                else{
+                    dir = new int[]{0, 0};
+                }
+            }
+        }
+        else{
+            if (getWorld() != null && isPlayer){
+                if (Greenfoot.isKeyDown("left")){
+                    dir[0] = -speed;
+                }
+                else if (Greenfoot.isKeyDown("right")){
+                    dir[0] = speed;
+                }
+                else{
+                    dir = new int[]{0, 0};
+                }
+            }
+        }
+        
+        
+        setLocation(getX() + dir[0], getY() + dir[1]); 
+        if (getX() + width/2 > getWorld().getWidth()){
+            setLocation(getWorld().getWidth() - width/2, getY());
+        }
+        else if (getX() - width/2 < 0){
+            setLocation(0 + width/2, getY());
+        }
+        /*
+        delayCounter++;
+        if (getOneIntersectingObject(Ball.class) != null && delayCounter>= delayStart) {
+            changeLevel();
+            delayCounter = 0;
+        }
+        */
+    }
+    
+    private void singlePlayer(){
         if (getWorld() != null && isPlayer){
             if (Greenfoot.isKeyDown("A") || Greenfoot.isKeyDown("left")){
                 dir[0] = -speed;
@@ -68,9 +128,6 @@ public class Paddle extends Actor
             else{
                 dir = new int[]{0, 0};
             }
-        }
-        if (sovs == null){
-            sovs = (PingWorld) getWorld();
         }
         
         setLocation(getX() + dir[0], getY() + dir[1]); 
@@ -85,11 +142,10 @@ public class Paddle extends Actor
             changeLevel();
             delayCounter = 0;
         }
-        else if(sovs.getPlayerScore()% 10 == 0 && currentPlayerScore != sovs.getPlayerScore())
+        else if(sovs.getPlayerScore() == currentPlayerScore + 10 && currentPlayerScore != sovs.getPlayerScore())
         {
-        changeLevel();
-        currentPlayerScore = sovs.getPlayerScore();
-            
+            changeLevel();
+            currentPlayerScore = sovs.getPlayerScore();
         }
     }
     /**
@@ -110,7 +166,7 @@ public class Paddle extends Actor
         if(life == 0) //die
         {
             sovs.stopped();
-            Greenfoot.setWorld(new Death());
+            Greenfoot.setWorld(new Death(playerNumber));
         }
     }
     public int getALife()
@@ -131,9 +187,9 @@ public class Paddle extends Actor
 
     public void changeLevel() { //Skifte background
         if (getOneIntersectingObject(Ball.class) != null) {
-         bounceCount++;
+            bounceCount++;
         }
-
+        
         if ((bounceCount == 10 || sovs.getPlayerScore() == currentPlayerScore + 10 ) && bounceCount != 0 && delayCounter>= delayStart && sovs.getPlayerScore() !=0 && currentPlayerScore != sovs.getPlayerScore()) {
             gameLevel++;
             life = 3;
@@ -151,6 +207,28 @@ public class Paddle extends Actor
             }
             Greenfoot.playSound("levelup.mp3");
         }
+    }
+    
+    public void constructPlayersForMultiplayer(int playerNumber, boolean isMultiplayer){
+        this.playerNumber = playerNumber;
+        this.multiplayer = isMultiplayer;
+    }
+    
+    public void updatedByBall(){
+        gameLevel++;
+        
+        String levelChanger = levelList[(gameLevel - 1) % levelList.length];
+        String paddleChanger = paddleList[(gameLevel - 1) % paddleList.length];
+        String ballLevel = ballList[(gameLevel - 1) % ballList.length];
+        
+        imagePaddle = paddleChanger;
+        sovs.setBackground(levelChanger);
+        sovs.updateScoreboard(gameLevel);
+        sovs.getObjects(Ball.class).get(0).init(speed + (int)(gameLevel * 0.5f),ballLevel);
+        for (Paddle jens : sovs.getObjects(Paddle.class)){
+            jens.setImage(paddleChanger);
+        }
+        Greenfoot.playSound("levelup.mp3");
     }
 }
 

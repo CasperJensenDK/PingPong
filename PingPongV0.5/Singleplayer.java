@@ -35,6 +35,6 @@ public class Singleplayer extends Actor
     
     public void onClick() {
         getWorld().stopped();
-        Greenfoot.setWorld(new PingWorld(true));
+        Greenfoot.setWorld(new PingWorld(true, false));
     }
 }
