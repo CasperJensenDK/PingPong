@@ -15,11 +15,18 @@ public class Paddle extends Actor
     private boolean isPlayer = false;
     private int[] dir;
     private int bounceCount;
-    private int gameLevel;
-    private String[] levelList;
+    private int gameLevel = 1;
+    static final String[] levelList = new String[] {"pingbackground0.png","pingbackground1.png", "pingbackground2.png", "pingbackground3.png", "pingbackground4.png", "pingbackground5.png", "pingbackground6.png"};
     private String[] ballList;
+    private String[] paddleList;
+    public static final Color[] colorList = new Color[] {Color.BLACK, Color.PINK.darker(), Color.YELLOW, Color.MAGENTA, Color.GREEN.brighter(),Color.GREEN.darker(), Color.WHITE};
     private int delayCounter;
     private int delayStart;
+    private static String imagePaddle = "paddle0.png";
+    private PingWorld sovs;
+    private int currentPlayerScore = 0;
+    private int life;
+
     
 
     /**
@@ -35,8 +42,13 @@ public class Paddle extends Actor
         createImage();    
         delayCounter = 0;
         delayStart = 50;
-        levelList = new String[] {"pingbackground1.png", "pingbackground2.png", "pingbackground3.png", "pingbackground4.png", "pingbackground5.png", "pingbackground6.png"};
-        ballList = new String[] {"ball1.png", "ball2.png", "ball3.png", "ball4.png", "ball5.png", "ball6.png"};
+        paddleList = new String[] {"paddle0.png","paddle1.png","paddle2.png","paddle3.png","paddle4.png","paddle5.png","paddle6.png"};
+        setImage(imagePaddle); 
+        ballList = new String[] {"ball0.png","ball1.png", "ball2.png", "ball3.png", "ball4.png", "ball5.png", "ball6.png"};
+        life = 3;
+        if (isPlayer){
+            imagePaddle = "paddle0.png";
+        }
     }
 
     /**
@@ -57,6 +69,9 @@ public class Paddle extends Actor
                 dir = new int[]{0, 0};
             }
         }
+        if (sovs == null){
+            sovs = (PingWorld) getWorld();
+        }
         
         setLocation(getX() + dir[0], getY() + dir[1]); 
         if (getX() + width/2 > getWorld().getWidth()){
@@ -69,9 +84,14 @@ public class Paddle extends Actor
         if (getOneIntersectingObject(Ball.class) != null && delayCounter>= delayStart) {
             changeLevel();
             delayCounter = 0;
-        }        
+        }
+        else if(sovs.getPlayerScore()% 10 == 0 && currentPlayerScore != sovs.getPlayerScore())
+        {
+        changeLevel();
+        currentPlayerScore = sovs.getPlayerScore();
+            
+        }
     }
-
     /**
      * Creates and sets an image for the paddle, the image will have the same dimensions as the paddles width and height.
      */
@@ -80,9 +100,23 @@ public class Paddle extends Actor
         GreenfootImage image = new GreenfootImage(width, height);
         image.setColor(Color.BLACK);
         image.fill();
-        setImage(image);
+        setImage(imagePaddle);
     }
     
+    public void subtractLife()
+    {
+        life--;
+        sovs.updateScoreboard(gameLevel);
+        if(life == 0) //die
+        {
+            sovs.stopped();
+            Greenfoot.setWorld(new Death());
+        }
+    }
+    public int getALife()
+    {
+        return life;
+    }
     public float getDx(){
         return speed;
     }
@@ -99,12 +133,23 @@ public class Paddle extends Actor
         if (getOneIntersectingObject(Ball.class) != null) {
          bounceCount++;
         }
-        
-        if (bounceCount % 10 == 0 && bounceCount != 0 && delayCounter>= delayStart) {
+
+        if ((bounceCount == 10 || sovs.getPlayerScore() == currentPlayerScore + 10 ) && bounceCount != 0 && delayCounter>= delayStart && sovs.getPlayerScore() !=0 && currentPlayerScore != sovs.getPlayerScore()) {
             gameLevel++;
-            String levelChanger = levelList[gameLevel % levelList.length];
-            getWorld().setBackground(levelChanger);
-            //Skift bold i "Ball" senere
+            life = 3;
+            bounceCount = 0;
+            currentPlayerScore = sovs.getPlayerScore();
+            String levelChanger = levelList[(gameLevel - 1) % levelList.length];
+            String paddleChanger = paddleList[(gameLevel - 1) % paddleList.length];
+            imagePaddle = paddleChanger;
+            sovs.setBackground(levelChanger);
+            String ballLevel = ballList[(gameLevel - 1) % ballList.length];
+            sovs.updateScoreboard(gameLevel);
+            sovs.getObjects(Ball.class).get(0).init(speed + (int)(gameLevel * 0.5f),ballLevel);
+            for (Paddle jens : sovs.getObjects(Paddle.class)){
+                jens.setImage(paddleChanger);
+            }
+            Greenfoot.playSound("levelup.mp3");
         }
     }
 }

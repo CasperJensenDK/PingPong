@@ -13,6 +13,7 @@ public class PingWorld extends World
     private static final int WORLD_HEIGHT = 700;
     
     private int playerScore;
+    private int level;
     //private int ballScore;
     private GreenfootImage playerScoreImage;
     //private GreenfootImage ballScoreImage;
@@ -43,8 +44,9 @@ public class PingWorld extends World
         spawnPaddle((Greenfoot.getRandomNumber(2) == 0) ? -1 : 1);
         
         playerScore = 0;
+        level = 1;
         //ballScore = 0;
-        updateScoreboard();
+        updateScoreboard(level);
     }
     // spawner en paddle et sted inden for skærmen
     private void spawnPaddle(int direction){
@@ -55,6 +57,9 @@ public class PingWorld extends World
         //                                                                          der hvor spiller spawner, buffer + højden fra centrum, tilføjer et minimum
         addObject(new PaddleCPU(100, 20, false, direction), x, Greenfoot.getRandomNumber(((WORLD_HEIGHT - 50) - 50 + 20/2) - paddleAfstandFraTop) + paddleAfstandFraTop);
     }
+    public int getPlayerScore(){
+        return playerScore;
+    }
     
     public void terminatePaddle(PaddleCPU kurt, int direction) {
         removeObject(kurt);
@@ -64,7 +69,7 @@ public class PingWorld extends World
     //Scoreboard stuff
     public void increasePlayerScore() {
         playerScore++;
-        updateScoreboard();
+        updateScoreboard(level);
     }
     
     /*public void increaseBallScore() {
@@ -72,14 +77,17 @@ public class PingWorld extends World
         updateScoreboard();
     }*/
     
-    private void updateScoreboard() {       
+    public void updateScoreboard(int gameLevel) {
+    setBackground(Paddle.levelList[(gameLevel - 1) % Paddle.levelList.length]);
     GreenfootImage background = getBackground();
-    background.setColor(Color.BLACK);
+    background.setColor(Paddle.colorList[(gameLevel - 1) % Paddle.levelList.length]);
     greenfoot.Font fontScore = new greenfoot.Font("OCR A Extended", true, false, 20);
     background.setFont(fontScore);
-    
+    level = gameLevel;
     background.drawString("Player: " + playerScore, 10, 30);
+    background.drawString("life: " + getObjects(Paddle.class).get(0).getALife(), 10, 50);
     //background.drawString("CPU: " + ballScore, 10, 60);
+    background.drawString("Level: " + gameLevel,350 ,30);
     }
     
     //Making sure music loops and stops when needed

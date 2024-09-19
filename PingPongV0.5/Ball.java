@@ -15,13 +15,15 @@ public class Ball extends Actor
     private static final int STARTING_ANGLE_WIDTH = 90;
     private static final int DELAY_TIME = 100;
 
-    private int speed;
+    private int speed = 2;
     private boolean hasBouncedHorizontally;
     private boolean hasBouncedVertically;
     private int delay;
     private boolean hasBouncedPaddle;
-    
+    private String ballImage = "ball0.png";
     private float[] dir; // enhedsvektor
+    private int[] dxdy = new int[]{0, 0};
+    private int besureSureCounter = 0;
 
     /**
      * Contructs the ball and sets it in motion!
@@ -29,7 +31,7 @@ public class Ball extends Actor
     public Ball()
     {
         createImage();
-        init();
+        init(speed, ballImage);
     }
 
     /**
@@ -37,9 +39,7 @@ public class Ball extends Actor
      */
     private void createImage()
     {
-        GreenfootImage ballImage = new GreenfootImage(BALL_SIZE,BALL_SIZE);
-        ballImage.setColor(Color.BLACK);
-        ballImage.fillOval(0, 0, BALL_SIZE, BALL_SIZE);
+        GreenfootImage ballImage = new GreenfootImage(this.ballImage);
         setImage(ballImage);
     }
 
@@ -61,6 +61,19 @@ public class Ball extends Actor
             checkPaddles();
             checkRestart();
         }
+        //stops ball from being stuck 
+        if (dxdy[0] - getX() == 0 && dxdy[1] - getY() == 0){
+            besureSureCounter++;
+        }
+        else{
+            dxdy[0] = getX();
+            dxdy[1] = getY();
+        }
+        if (besureSureCounter >= 200){
+            init(speed, ballImage);
+            besureSureCounter = 0;
+        }
+        
     }
     
     private float[] crossvector(float[] input, Object pad, boolean isPlayer){
@@ -94,6 +107,8 @@ public class Ball extends Actor
                 tanB = (posY) ? -Math.abs(tanInputAngle) : Math.abs(tanInputAngle);
                 x = length * (float) Math.cos(tanB);
                 y = length * (float) Math.sin(tanB);
+                PingWorld såvs = (PingWorld)getWorld();
+                såvs.increasePlayerScore();
            }
         }
         // mangler opdatering fra player - burde være samme som ceiling
@@ -102,8 +117,8 @@ public class Ball extends Actor
             // betingelse
             tanB = (posY) ? -Math.abs(tanInputAngle) : Math.abs(tanInputAngle);;
             // nye koordinater sumvektor
-            Random rnd = new Random();
-            x = length * (float) Math.cos(tanB) + ((player.getDir()[0]/2) + rnd.nextFloat());
+            Random jesus = new Random();
+            x = length * (float) Math.cos(tanB) + ((player.getDir()[0]/2) + jesus.nextFloat());
             y = length * (float) Math.sin(tanB) + player.getDir()[1];
             
             if (y < minY && y > -minY ){
@@ -179,11 +194,13 @@ public class Ball extends Actor
                 try {
                     PaddleCPU ai = (PaddleCPU) pad;
                     if (dir[1] < 0){
+                        Greenfoot.playSound("hitcpu.wav");
                         dir = crossvector(dir, ai, false);
                     }
                 }
                 catch (java.lang.ClassCastException e)
                 {
+                    Greenfoot.playSound("hitplayer.wav");
                     Paddle player = (Paddle) pad;
                     dir = crossvector(dir, player, true);
                 }
@@ -205,6 +222,7 @@ public class Ball extends Actor
         {
             if (! hasBouncedHorizontally)
             {
+                Greenfoot.playSound("hitwall.wav");
                 revertHorizontally();
             }
         }
@@ -224,6 +242,7 @@ public class Ball extends Actor
         {
             if (! hasBouncedVertically)
             {
+                Greenfoot.playSound("getPoint.wav");
                 revertVertically();
             }
         }
@@ -242,9 +261,11 @@ public class Ball extends Actor
         // genstarte/tabe
         if (isTouchingFloor())
         {
-            init();
-            setLocation(getWorld().getWidth() / 2, getWorld().getHeight() / 2);
+            Greenfoot.playSound("loselife.mp3");
+            getWorld().getObjects(Paddle.class).get(0).subtractLife();
+            init(speed, ballImage);
         }
+    
     }
 
     
@@ -272,20 +293,25 @@ public class Ball extends Actor
     /**
      * Initialize the ball settings.
      */
-    private void init()
+    public void init(int speed, String image)
     {
-        speed = 2;
+        this.speed = speed;
         delay = DELAY_TIME;
         hasBouncedHorizontally = false;
         hasBouncedVertically = false;
         hasBouncedPaddle = false;
         int num = 1;
         int rot = 45;
-        
+        ballImage = image;
+        createImage();
         // måske gør sådan at den kan falde lige ned
         if (Greenfoot.getRandomNumber(2) == 1){
             num = -1;
             rot += 90;
+        }
+        if (getWorld() != null)
+        {
+        setLocation(getWorld().getWidth() / 2, getWorld().getHeight() / 2);    
         }
         
         dir = new float[]{num, 1};
