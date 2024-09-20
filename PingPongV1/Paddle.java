@@ -19,7 +19,7 @@ public class Paddle extends Actor
     static final String[] levelList = new String[] {"pingbackground0.png","pingbackground1.png", "pingbackground2.png", "pingbackground3.png", "pingbackground4.png", "pingbackground5.png", "pingbackground6.png"};
     private String[] ballList;
     private String[] paddleList;
-    public static final Color[] colorList = new Color[] {Color.BLACK, Color.PINK.darker(), Color.YELLOW, Color.MAGENTA, Color.GREEN.brighter(),Color.GREEN.darker(), Color.WHITE};
+    public static final Color[] colorList = new Color[] {Color.BLACK, Color.PINK, Color.YELLOW, Color.MAGENTA, Color.GREEN.brighter(),Color.GREEN.darker(), Color.WHITE};
     private int delayCounter;
     private int delayStart;
     private static String imagePaddle = "paddle0.png";
@@ -47,13 +47,13 @@ public class Paddle extends Actor
         delayCounter = 0;
         delayStart = 50;
         paddleList = new String[] {"paddle0.png","paddle1.png","paddle2.png","paddle3.png","paddle4.png","paddle5.png","paddle6.png"};
-        setImage(imagePaddle); 
         ballList = new String[] {"ball0.png","ball1.png", "ball2.png", "ball3.png", "ball4.png", "ball5.png", "ball6.png"};
         life = 3;
         if (isPlayer){
             imagePaddle = "paddle0.png";
             gameLevel = 1;
         }
+        setImage(imagePaddle);
     }
 
     /**
